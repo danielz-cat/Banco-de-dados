@@ -1,1 +1,24 @@
 create database "Daniel.z";
+
+create table tb_usuario (
+	id_usuario serial primary key,
+	tx_nome varchar(80),
+	tx_email varchar(200),
+	tx_senha varchar(200),
+	td_cadastro timestamp
+);
+create table tb_produto (
+	id_produto serial primary key,
+	tx_nome varchar(80),
+	nr_quantidade numeric(10,0), 
+	vl_valor numeric (10,2)
+	
+);
+create table tb_venda (
+    cd_venda serial primary key,
+    cd_produto integer references tb_produto(id_produto),
+    nr_quantidade numeric(10,0),
+    vl_valor_unitario numeric(10,2),
+    vl_valor_total numeric(10,2),
+    dt_venda date
+);

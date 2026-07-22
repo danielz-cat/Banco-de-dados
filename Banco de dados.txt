@@ -1,24 +1,67 @@
 create database "Daniel.z";
 
+insert into tb_usuario(tx_nome, tx_email, tx_senha)
+values ('admin', 'admin@gmail.com', '89899898');
+insert into tb_usuario(tx_nome,  tx_email, tx_senha)
+values ('daniel', 'daniel.gr@gmail.com', '14422335');
+insert into tb_usuario(tx_nome,  tx_email, tx_senha)
+values ('joao', 'joao.fe@gmail.com', '40028922');
+insert into tb_usuario(tx_nome,  tx_email, tx_senha)
+values ('carla', 'carla.fc@gmail.com', '65490214');
+
 create table tb_usuario (
 	id_usuario serial primary key,
 	tx_nome varchar(80),
-	tx_email varchar(200),
-	tx_senha varchar(200),
-	td_cadastro timestamp
+	nr_idade numeric(18,0) default 18,
+	tx_email varchar(200) not null,
+	tx_senha varchar(200) not null,
+	dt_cadastro timestamp default current_date
 );
 create table tb_produto (
 	id_produto serial primary key,
-	tx_nome varchar(80),
-	nr_quantidade numeric(10,0), 
-	vl_valor numeric (10,2)
-	
+	tx_nome varchar(80) not null,
+	nr_quantidade numeric(10,0) not null, 
+	vl_valor numeric (10,2) not null
 );
 create table tb_venda (
     cd_venda serial primary key,
     cd_produto integer references tb_produto(id_produto),
-    nr_quantidade numeric(10,0),
-    vl_valor_unitario numeric(10,2),
-    vl_valor_total numeric(10,2),
-    dt_venda date
+    nr_quantidade numeric(10,0)not null,
+    vl_valor_unitario numeric(10,2)not null,
+    vl_valor_total numeric(10,2)not null,
+    dt_venda date default current_date
 );
+
+select nr_valor, tx_operacao from tb_calculadora
+where tx_operacao = '+';
+select sum(nr_valor) from tb_calculadora
+where tx_operacao = '+';
+
+create table tb_calculadora (
+	id_calculo serial primary key,
+	nr_valor numeric(10,2)not null,
+	tx_operacao varchar(10)not null
+);
+
+insert into tb_calculadora (nr_valor, tx_operacao)
+values
+(10.00, '+'),
+(20.00, '+'),
+(30.00, '+'),
+(40.00, '+'),
+
+(50.00, '-'),
+(15.00, '-'),
+(8.00, '-'),
+(3.00, '-'),
+
+
+(2.00, '*'),
+(5.00, '*'),
+(10.00, '*'),
+(4.00, '*'),
+
+(100.00, '/'),
+(50.00, '/'),
+(25.00, '/'),
+(5.00, '/');

@@ -65,3 +65,44 @@ values
 (50.00, '/'),
 (25.00, '/'),
 (5.00, '/');
+
+aula 04/08 
+criando trabelas com comando extenso
+create table tb_aluno(
+	id_aluno serial,
+	tx_nome varchar(255),
+	tx_email varchar(255),
+	nr_telefone numeric(18,0),
+
+	constraint pk_tb_aluno primary key(id_aluno)
+);
+create table tb_professor(
+	id_professor serial,
+	tx_nome varchar(255),
+	tx_email varchar(255),
+	nr_telefone numeric(18,0),
+
+	constraint pk_tb_professor primary key(id_professor)
+);
+create table tb_materia(
+	id_materia serial,
+	tx_nome varchar(255),
+	cd_professor integer,
+	nr_cargahoraria numeric(18,0),
+
+	constraint pk_tb_materia primary key(id_materia),
+	constraint fk_tb_materia_cd_professor foreign key(cd_professor) references tb_professor(id_professor)
+);
+create table tb_notas(
+	id_notas serial,
+	cd_professor integer,
+	cd_materia integer,
+	vl_prova1 numeric(10,2),
+	vl_prova2 numeric(10,2),
+	vl_trabalho numeric(10,2),
+
+	constraint pk_tb_notas primary key(id_notas),
+	constraint fk_tb_notas_cd_professor foreign key(cd_professor) references tb_professor(id_professor),
+	constraint fk_tb_notas_cd_materia foreign key(cd_materia) references tb_materia(id_materia)
+
+);

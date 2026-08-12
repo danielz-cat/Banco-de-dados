@@ -106,3 +106,56 @@ create table tb_notas(
 	constraint fk_tb_notas_cd_materia foreign key(cd_materia) references tb_materia(id_materia)
 
 );
+aula 11/08/26
+create table tb_user(
+	id_user serial,
+	tx_name varchar(150)not null,
+	tx_email varchar (250)not null,
+	tx_senha varchar (250)not null,
+	cd_typeuser integer,
+
+	constraint pk_tb_user primary key(id_user),
+	constraint fk_tb_user_cd_typeuser foreign key (cd_typeuser) references tb_user_type(id_usertype)
+
+);
+
+create table tb_user_type(
+	id_usertype serial,
+	tx_type varchar(80) not null,
+	dt_criacao timestamp default now(),
+
+	constraint pk_tb_user_type primary key(id_usertype)
+);
+
+insert into tb_user_type(
+	tx_type
+)
+values
+	('Admin'),
+	('funcionario'),
+	('gerente');
+	
+insert into tb_user (
+    tx_name,
+    tx_email,
+    tx_senha,
+    cd_typeuser
+)
+values
+    ('João', 'joao@email.com', 'Joao2026A91', 1),
+    ('Maria', 'maria@email.com', 'Maria2026B42', 2),
+    ('Pedro', 'pedro@email.com', 'Pedro2026C78', 3),
+    ('Maria', 'maria2@email.com', 'Maria2026D15', 2),
+    ('Ana', 'ana@email.com', 'Ana2026E63', 2),
+    ('Carlos', 'carlos@email.com', 'Carlos2026F84', 2),
+    ('Marcos', 'marcos@email.com', 'Marcos2026G27', 2),
+    ('Maria Clara', 'mariac@email.com', 'MariaClara2026H51', 2),
+    ('Mario', 'mario@email.com', 'Mario2026I39', 2),
+    ('Davi', 'davi@email.com', 'Davi2026J72', 2),
+    ('Kauan', 'kauan@email.com', 'Kauan2026K46', 2),
+    ('Enzo', 'enzo@email.com', 'Enzo2026L93', 2),
+    ('Fred', 'fred@email.com', 'Fred2026M18', 2);
+	select * from tb_user;
+	 inner join tb_user_type on
+    tb_user_type.id_usertype =
+    u.cd_typeuser

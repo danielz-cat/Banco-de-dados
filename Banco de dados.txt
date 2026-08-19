@@ -159,3 +159,48 @@ values
 	 inner join tb_user_type on
     tb_user_type.id_usertype =
     u.cd_typeuser
+
+	aula 18/08/26
+
+	SELECT id_user , tx_name 
+FROM tb_user
+INNER JOIN tb_user_type
+    ON tb_user = tb_user_type;
+
+
+create database curso;
+
+SELECT *
+
+FROM tb_professor 
+INNER JOIN tb_disciplina 
+  on tb_disciplina.cd_professor =
+   tb_professor.id_professor
+
+   SELECT *
+FROM tb_aluno
+INNER JOIN tb_curso
+    ON tb_aluno.cd_curso = tb_curso.id_curso
+INNER JOIN tb_nota
+    ON tb_aluno.id_aluno = tb_nota.cd_matricula ;
+	
+
+	select
+tb_aluno.tx_nome,
+tb_nota.vl_nota_1 ,
+tb_nota.vl_nota_2,
+tb_nota.vl_nota_3,
+tb_curso.tx_nome
+from
+tb_curso
+inner join tb_aluno on
+tb_aluno.cd_curso = tb_curso.id_curso
+inner join tb_matricula on
+tb_matricula.cd_aluno = tb_aluno.id_aluno
+inner join tb_nota on
+tb_nota.cd_matricula = tb_matricula.id_matricula
+where
+(
+(tb_nota.vl_nota_1 >= 9
+	and tb_nota.vl_nota_2 > 8)
+	or tb_nota.vl_nota_1 < 7)

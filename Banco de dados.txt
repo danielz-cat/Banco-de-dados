@@ -204,3 +204,89 @@ where
 (tb_nota.vl_nota_1 >= 9
 	and tb_nota.vl_nota_2 > 8)
 	or tb_nota.vl_nota_1 < 7)
+
+	aula 21/08/26
+	select
+    id_aluno,
+    tx_nome,
+    tx_email,
+    dt_nascimento,
+    tx_cidade
+from tb_aluno
+order by tx_cidade asc;
+
+select 
+	a.id_aluno,
+    a.tx_nome,
+    a.tx_email,
+    n.vl_nota,
+    n.tx_bimestre
+from tb_aluno a
+inner join tb_matricula m
+	on a.id_aluno = m.id_aluno
+inner join tb_nota n
+    on m.id_matricula = n.id_matricula
+where  n.vl_nota < 5
+order by n.vl_nota ASC;
+
+select * from tb_aluno 
+where tx_nome like 'pedro%'
+
+select *
+from tb_turma t
+left join tb_matricula m
+    on t.id_turma = m.id_turma
+left join tb_nota n
+    on m.id_matricula = n.id_matricula
+where n.id_nota  is null
+order by t.id_turma asc;
+
+
+select *
+from tb_aluno a
+left join tb_matricula m
+    on a.id_aluno = m.id_aluno
+where m.id_matricula is null
+order by a.tx_nome asc;
+
+select *
+from tb_aluno
+where tx_cidade = 'Chapecó';
+
+select *
+from tb_aluno a
+inner join tb_matricula m
+    on a.id_aluno = m.id_aluno
+inner join tb_nota n
+    on m.id_matricula = n.id_matricula
+where n.vl_nota in (5, 3, 7, 9)
+order by n.vl_nota asc;
+
+select count(vl_nota),
+		sum(vl_nota),
+		id_diciplina
+		cd_matricula
+from tb_nota
+group by id_diciplina
+
+select
+    tx_cidade,
+    count(id_aluno) as quantidade_alunos
+from tb_aluno
+group by tx_cidade
+order by tx_cidade asc;
+
+select
+    t.id_turma,
+    t.tx_codigo,
+    count(n.id_nota) as quantidade_notas
+from  tb_turma t
+left join tb_matricula m
+    on t.id_turma = m.id_turma
+left join tb_nota n
+    on m.id_matricula = n.id_matricula
+group by
+    t.id_turma,
+    t.tx_codigo
+order by
+    t.id_turma asc;

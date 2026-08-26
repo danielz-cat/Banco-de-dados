@@ -290,3 +290,72 @@ group by
     t.tx_codigo
 order by
     t.id_turma asc;
+
+	aula 25/08/26 
+	select 
+tp.id_produto, 
+tp.tx_nome as nome_produto, 
+tp.vl_preco, 
+tc.tx_nome as nome_categoria
+from tb_produto tp 
+inner join  tb_categoria tc 
+    on tp.cd_categoria  = tc.id_categoria 
+where
+tp.fl_ativo is true
+and tp.vl_preco   between 500 and 1000
+order by tp.tx_nome  asc;
+
+select 
+tc.tx_nome,
+tc.tx_cpf,
+tc.tx_email,
+tc.tx_estado 
+from tb_cliente tc 
+where UPPER(tc.tx_estado) in (upper('SC'), upper('PR'))
+order by tc.tx_nome   asc;
+
+select 
+tc.tx_nome as nomeUsuario,
+tc.nr_idade as idadeUsuario,
+tc.tx_email 
+from tb_cliente tc 
+where tc.tx_email  is null or tc.nr_idade > (50)
+order by tc.tx_nome  asc;
+
+select 
+tp.tx_nome as nome_produto, 
+tp.vl_preco,
+tf.tx_nome as nomeFornecedor,
+tc.tx_descricao as descricaoCategoria
+from tb_produto tp 
+inner join  tb_categoria tc 
+    on tp.cd_categoria  = tc.id_categoria 
+inner join tb_fornecedor tf   
+	on tp.cd_fornecedor = tf.id_fornecedor 
+where
+tp.fl_ativo is true
+order by tp.vl_preco  desc;
+
+select
+    tc.tx_nome as nome,
+    tc.tx_cidade as cidade,
+    sum(tiv.nr_quantidade * tiv.vl_unitario) as total_vendas
+from tb_cliente tc
+left join tb_venda tv
+    on tv.cd_cliente = tc.id_cliente
+left join tb_item_venda tiv
+    on tiv.cd_venda = tv.id_venda
+group by
+    tc.id_cliente,
+    tc.tx_nome,
+    tc.tx_cidade
+order by total_vendas desc;
+
+select
+    tc.id_categoria,
+    tc.tx_nome as nome_categoria
+from tb_categoria tc
+left join tb_produto tp
+    on tp.cd_categoria = tc.id_categoria
+where tp.id_produto is null
+order by tc.tx_nome asc;

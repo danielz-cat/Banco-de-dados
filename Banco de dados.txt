@@ -359,3 +359,80 @@ left join tb_produto tp
     on tp.cd_categoria = tc.id_categoria
 where tp.id_produto is null
 order by tc.tx_nome asc;
+
+aula 27/08/26
+select 
+	tc.tx_nome as nomeCliente,
+	te.tx_cidade as cidadeCliente,
+	te.tx_estado as estadoCliente, 
+	email.tx_contato as email,
+	telefone.tx_contato as telefone,
+	celular.tx_contato as celular
+from tb_cliente tc 	
+inner join tb_contato email 
+	on email.cd_cliente = tc.id_cliente 
+	and email.cd_tipo_contato = 1
+inner join tb_contato telefone 
+	on telefone.cd_cliente = tc.id_cliente 
+	and telefone.cd_tipo_contato = 2
+	inner join tb_contato celular 
+	on celular.cd_cliente = tc.id_cliente 
+	and celular.cd_tipo_contato = 3
+inner join tb_endereco te 
+	on te.id_endereco = tc.cd_endereco 
+order by tc.tx_nome asc;	
+
+ select 
+ 	tc.tx_nome as nomeCliente,
+ 	tp.tx_descricao,
+ 	ta.tx_comentario as comentario,
+ 	ta.nr_nota
+ from  tb_cliente tc	
+ inner join tb_avaliacao ta 
+ 	on ta.cd_cliente = tc.id_cliente
+ inner join tb_produto tp 
+ 	on tp.id_produto = ta.cd_produto 
+ 	
+select 
+    tc.tx_nome as nomecliente,
+   	email.tx_contato  
+from tb_cliente tc
+left join tb_contato email
+    on email.cd_cliente = tc.id_cliente
+    and email.fl_principal is true
+    and email.cd_tipo_contato = 1
+order by tc.tx_nome asc;
+
+ 
+select 	
+	tx_nome, 
+	nr_idade 
+from 
+	tb_cliente 
+where 
+	nr_idade > ( 
+	select
+	SUM(nr_idade) / count(id_cliente )
+from 
+	tb_cliente tc )
+
+select
+    tc.tx_descricao as tipo_contato,
+    count(ct.cd_cliente) as quantidade
+from tb_tipo_contato tc
+left join tb_contato ct
+    on ct.cd_tipo_contato = tc.id_tipo_contato
+    and ct.fl_ativo = true
+group by tc.id_tipo_contato, tc.tx_descricao
+order by tc.id_tipo_contato;
+	
+select
+    c.tx_nome as nome,
+    max(v.dt_venda) as data_compra_mais_recente
+from tb_cliente c
+join tb_venda v
+    on v.cd_cliente = c.id_cliente
+where v.tx_status = 'PAGO'
+group by c.id_cliente, c.tx_nome
+order by data_compra_mais_recente desc;	
+		

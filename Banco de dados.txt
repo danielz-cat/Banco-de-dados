@@ -435,4 +435,62 @@ join tb_venda v
 where v.tx_status = 'PAGO'
 group by c.id_cliente, c.tx_nome
 order by data_compra_mais_recente desc;	
-		
+
+aula 28/08/26
+select
+    tb_empresa.tx_razao_social as razao_social,
+    resultado.quantidade_vendas_pagas,
+    resultado.receita_bruta_total
+from tb_empresa
+inner join (
+ 
+select
+        tb_venda.cd_empresa,
+        count(*) as quantidade_vendas_pagas,
+        sum(resultado_venda.valor_venda) as receita_bruta_total
+    from tb_venda
+    inner join (
+        select
+            tb_item_venda.cd_venda,
+            sum(
+                tb_item_venda.nr_quantidade *
+                tb_item_venda.vl_unitario
+            ) as valor_venda
+        from tb_item_venda
+        group by tb_item_venda.cd_venda
+    ) as resultado_venda
+        on resultado_venda.cd_venda = tb_venda.id_venda
+    where tb_venda.tx_status = 'pago'
+    group by tb_venda.cd_empresa
+) as resultado
+    on resultado.cd_empresa = tb_empresa.id_empresa
+where resultado.quantidade_vendas_pagas > 3
+  and resultado.receita_bruta_total > 10000
+order by resultado.receita_bruta_total desc;
+
+with preco as (
+select
+sum(item.nr_quantidade * item.vl_unitario ) precoBruto,
+ven.cd_empresa
+from
+tb_venda ven
+inner join tb_item_venda item
+on item.cd_venda = ven.id_venda
+where upper(ven.tx_status) = upper('PAGO')
+group by ven.cd_empresa) ,
+vendas as (
+select
+count(id_venda) totalvendas,
+ven.cd_empresa
+from
+tb_venda ven
+where upper(ven.tx_status) = upper('PAGO')
+group by ven.cd_empresa
+)
+select * from tb_empresa
+inner join vendas on vendas.cd_empresa = id_empresa
+inner join preco on preco.cd_empresa = id_empresa
+where
+precoBruto > 10000
+and totalvendas > 3
+order by precoBruto desc		

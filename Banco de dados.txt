@@ -494,3 +494,27 @@ where
 precoBruto > 10000
 and totalvendas > 3
 order by precoBruto desc		
+
+aula 01/09/26
+select 
+ tx_nome 
+ from tb_cliente 
+ where tx_nome ilike 'a%'
+ or tx_nome  ilike '%o' ;
+ 
+with vendas as (
+select
+cd_cliente,
+sum(produto.nr_quantidade * produto.vl_unitario ) as valor
+from tb_venda
+inner join tb_item_venda produto on produto.cd_venda = id_venda
+where
+upper(tx_status) = 'PAGO'
+group by
+cd_cliente
+), media as (
+select sum(valor) / count(distinct cd_cliente) as mediaa from vendas
+)
+select * from tb_cliente
+inner join vendas on cd_cliente = id_cliente
+inner join media on valor > mediaa

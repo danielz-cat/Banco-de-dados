@@ -518,3 +518,51 @@ select sum(valor) / count(distinct cd_cliente) as mediaa from vendas
 select * from tb_cliente
 inner join vendas on cd_cliente = id_cliente
 inner join media on valor > mediaa
+
+aula 02/09/26
+
+with conta as (
+select 
+	cd_cliente as codigo,
+	count( distinct id_venda) as nr_compra,
+	sum(nr_quantidade * vl_unitario)as vl_totalgasto,
+	min(dt_venda) as dt_primeiracompra,
+	max(dt_venda) as dt_ultimacompra
+from tb_venda tv 
+inner join tb_item_venda tiv 
+	on tiv.cd_venda  = tv.id_venda
+where 
+upper(tv.tx_status) = 'PAGO'
+group by cd_cliente 
+)
+select
+	nr_compra,
+	vl_totalgasto,
+	dt_primeiracompra,
+	dt_ultimacompra,
+	tc.tx_nome,
+	te.tx_cidade ,
+	(
+	select produto.tx_descricao 
+	from tb_venda
+	inner join tb_item_venda item 
+		on item.cd_venda = id_venda 
+	inner join tb_produto
+		on item.cd_produto = id_produto 
+	order by sum(item.nr_quantidade) desc
+	group by produto.id_produto
+	limit 1 
+	)
+from tb_cliente tc 
+inner join tb_endereco te 
+	on tc.cd_endereco = te.id_endereco 
+inner join 	conta  on conta.codigo  = tc.id_cliente 
+
+
+
+
+row number() over(
+	partition by tv.cd_cliente
+	order by sum(tiv.nr_quantidade) desc
+)	
+

@@ -521,48 +521,162 @@ inner join media on valor > mediaa
 
 aula 02/09/26
 
-with conta as (
-select 
-	cd_cliente as codigo,
-	count( distinct id_venda) as nr_compra,
-	sum(nr_quantidade * vl_unitario)as vl_totalgasto,
-	min(dt_venda) as dt_primeiracompra,
-	max(dt_venda) as dt_ultimacompra
-from tb_venda tv 
-inner join tb_item_venda tiv 
-	on tiv.cd_venda  = tv.id_venda
-where 
-upper(tv.tx_status) = 'PAGO'
-group by cd_cliente 
+with vendas as (
+select
+	count(distinct venda.id_venda) as nr_compras,
+	max(venda.dt_venda ) as dt_ultimacompra,
+	min(venda.dt_venda ) as dt_primeiracompra,
+	sum(prod.nr_quantidade * prod.vl_unitario) as vl_totalgasto,
+	venda.cd_cliente as cliente
+from tb_venda venda
+inner join tb_item_venda prod
+on prod.cd_venda = venda.id_venda
+where
+	upper(venda.tx_status) = upper('pago')
+group by venda.cd_cliente
 )
 select
-	nr_compra,
-	vl_totalgasto,
-	dt_primeiracompra,
-	dt_ultimacompra,
-	tc.tx_nome,
-	te.tx_cidade ,
-	(
-	select produto.tx_descricao 
-	from tb_venda
-	inner join tb_item_venda item 
-		on item.cd_venda = id_venda 
-	inner join tb_produto
-		on item.cd_produto = id_produto 
-	order by sum(item.nr_quantidade) desc
-	group by produto.id_produto
-	limit 1 
-	)
-from tb_cliente tc 
-inner join tb_endereco te 
-	on tc.cd_endereco = te.id_endereco 
-inner join 	conta  on conta.codigo  = tc.id_cliente 
+	cliente.tx_nome as nome,
+	ende.tx_cidade as cidade,
+	vendas.dt_primeiracompra,
+	vendas.dt_ultimacompra,
+	vendas.vl_totalgasto,
+	vendas.nr_compras,
+case
+when vendas.nr_compras < 1 then 'CLIENTE PEQUENO'
+when vendas.nr_compras = 1 then 'CLIENTE MEDIO'
+when vendas.nr_compras = 2 then 'CLIENTE GRANDE'
+else 'OUTROS'
+end as status,
+(
+select
+	p.tx_nome as produtoFavorito
+from
+	tb_venda venda
+inner join tb_item_venda prod on
+	prod.cd_venda = venda.id_venda
+inner join tb_produto p on p.id_produto = prod.cd_produto
+where
+	upper(venda.tx_status) = upper('pago')
+and cliente.id_cliente = venda.cd_cliente
+group by p.tx_nome, p.id_produto
+order by sum(prod.nr_quantidade) desc
+limit 1
+) as produtoFavorito2
+from tb_cliente cliente
+inner join tb_endereco ende on ende.id_endereco = cliente.cd_endereco
+inner join vendas on vendas.cliente = cliente.id_cliente	
+
+aula 04/09/26
+
+create table tb_exercicio11(
+	tx_nome varchar(255) not null ,
+	tx_cidade varchar(255) not null ,
+	dt_primeiracompra timestamp not null ,
+	dt_ultimacompra timestamp not null ,
+	vl_valorgasto numeric (18,2) not null,
+	nr_quatidadecompras numeric(18,0) ,
+	tx_statuscliente varchar(255) not null,
+	tx_produtoFavorito varchar(255) not null
+);
+
+insert into tb_exercicio11 (
+	tx_nome, 
+	tx_cidade, 
+	dt_primeiracompra, 
+	dt_ultimacompra, 
+	vl_valorgasto, 
+	nr_quatidadecompras, 
+	tx_statuscliente, 
+	tx_produtoFavorito
+) values 
+(
+    'Ana Souza',
+    'Chapecó',
+    '2024-01-10 09:30:00',
+    '2024-03-22 13:30:00',
+    8579.77,
+    2,
+    'cliente grande',
+    'Mouse Multilaser'
+),
+(
+    'Bruno Lima',
+    'Florianópolis',
+    '2024-01-15 14:00:00',
+    '2024-06-12 11:00:00',
+    12649.77,
+    2,
+    'cliente grande',
+    'iPhone 15'
+),
+(
+    'Carla Mendes',
+    'Joinville',
+    '2024-02-03 11:15:00',
+    '2024-02-03 11:15:00',
+    9299.98,
+    1,
+    'cliente medio',
+    'iPhone 15'
+),
+(
+    'Eva Costa',
+    'Porto Alegre',
+    '2024-03-05 10:00:00',
+    '2024-03-05 10:00:00',
+    6799.98,
+    1,
+    'cliente medio',
+    'LG OLED 55"'
+),
+(
+    'Gabriela Pinto',
+    'Chapecó',
+    '2024-04-18 15:20:00',
+    '2024-04-18 15:20:00',
+    7299.98,
+    1,
+    'cliente medio',
+    'AirPods Pro'
+),
+(
+    'Henrique Alves',
+    'Blumenau',
+    '2024-05-07 10:45:00',
+    '2024-05-07 10:45:00',
+    4299.97,
+    1,
+    'cliente medio',
+    'Samsung SSD 1TB'
+),
+(
+    'Isabela Rocha',
+    'Joinville',
+    '2024-05-30 14:00:00',
+    '2024-05-30 14:00:00',
+    10269.68,
+    1,
+    'cliente medio',
+    'Mouse Multilaser'
+);
+
+select *
+from tb_exercicio11 
+
+alter table tb_exercicio11 
+	add column nr_idade numeric (18,0) default 18
+
+alter table tb_exercicio11 
+	drop  column nr_idade;
+
+alter table tb_produto  
+	add column vl_peso numeric (18, 3)
+	
+alter table tb_cliente  
+	add column tx_cnpj varchar (255)	
 
 
 
-
-row number() over(
-	partition by tv.cd_cliente
-	order by sum(tiv.nr_quantidade) desc
-)	
-
+select *
+from tb_produto tp 

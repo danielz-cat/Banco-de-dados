@@ -720,4 +720,171 @@ add column cd_cliente integer
 references tb_cliente (id_cliente);
 
 select *
-from tb_pedido tp 
+from tb_pedido tp
+
+aula 22/09/26
+
+create sequence seq_perfil start 2 increment 2;
+comment on table tb_perfil is 'tabela que atribui a tipagem/permição ao usuario';
+create table tb_perfil (
+    id_perfil numeric(18,0) default nextval('seq_perfil') primary key,
+    tx_nome varchar(50) not null unique
+);
+
+create sequence seq_usuario start 2 increment 4;
+
+create table tb_usuario (
+    id_usuario numeric(18,0) default nextval('seq_usuario') primary key,
+    cd_perfil numeric(18,0) not null,
+    tx_nome varchar(150) not null,
+    tx_email varchar(255) not null unique,
+    tx_senha varchar(255) not null,
+    fl_ativo boolean not null default true,
+    constraint fk_usuario_perfil
+        foreign key (cd_perfil) references tb_perfil (id_perfil)
+);
+
+create sequence seq_categoria start 2 increment 6;
+comment on table tb_categoria is 'tabela que atribui uma categoria ao produto';
+
+create table tb_categoria (
+    id_categoria numeric(18,0) default nextval('seq_categoria') primary key,
+    tx_nome varchar(100) not null unique
+);
+
+create sequence seq_produto start 2 increment 2;
+
+create table tb_produto (
+    id_produto numeric(18,0) default nextval('seq_produto') primary key,
+    cd_categoria numeric(18,0) not null,
+    tx_nome varchar(150) not null,
+    tx_codigo varchar(50) not null unique,
+    vl_custo numeric(12,2) not null default 0,
+    vl_valor numeric(12,2) not null,
+    fl_ativo boolean not null default true,
+    constraint fk_produto_categoria
+        foreign key (cd_categoria) references tb_categoria (id_categoria),
+    constraint ck_produto_valor
+        check (vl_valor >= 0),
+    constraint ck_produto_custo
+        check (vl_custo >= 0)
+);
+
+create sequence seq_estoque start 2 increment 4;
+
+create table tb_estoque (
+    id_estoque numeric(18,0) default nextval('seq_estoque') primary key,
+    cd_produto numeric(18,0) not null unique,
+    nr_quantidade numeric(18,0) not null default 0,
+    nr_estoque_minimo numeric(18,0) not null default 0,
+    fl_ativo boolean not null default true,
+    constraint fk_estoque_produto
+        foreign key (cd_produto) references tb_produto (id_produto),
+    constraint ck_estoque_quantidade
+        check (nr_quantidade >= 0),
+    constraint ck_estoque_minimo
+        check (nr_estoque_minimo >= 0)
+);
+
+create sequence seq_pagamento start 2 increment 6; 
+
+create table tb_forma_pagamento (
+    id_forma_pagamento numeric(18,0) default nextval('seq_pagamento') primary key,
+    tx_nome varchar(50) not null unique
+);
+
+create sequence seq_venda start 2 increment 2;
+
+create table tb_venda (
+    id_venda numeric(18,0) default nextval('seq_venda') primary key,
+    cd_usuario numeric(18,0) not null,
+    cd_forma_pagamento numeric(18,0) not null,
+    dt_venda timestamp not null default current_timestamp,
+    vl_total numeric(12,2) not null default 0,
+    fl_cancelada boolean not null default false,
+    constraint fk_venda_usuario
+        foreign key (cd_usuario) references tb_usuario (id_usuario),
+    constraint fk_venda_forma_pagamento
+        foreign key (cd_forma_pagamento) references tb_forma_pagamento (id_forma_pagamento),
+    constraint ck_venda_total
+        check (vl_total >= 0)
+);
+
+create sequence seq_venda_produto start 2 increment 4;
+
+create table tb_venda_produto (
+    id_venda_produto numeric(18,0) default nextval('seq_venda_produto') primary key,
+    cd_venda numeric(18,0) not null,
+    cd_produto numeric(18,0) not null,
+    nr_quantidade numeric(18,0) not null,
+    vl_valor numeric(12,2) not null,
+    constraint fk_venda_produto_venda
+        foreign key (cd_venda) references tb_venda (id_venda),
+    constraint fk_venda_produto_produto
+        foreign key (cd_produto) references tb_produto (id_produto),
+    constraint ck_venda_produto_quantidade
+        check (nr_quantidade > 0),
+    constraint ck_venda_produto_valor
+        check (vl_valor >= 0)
+);
+
+create sequence seq_mv_estoque start 2 increment 6;
+
+create table tb_movimentacao_estoque (
+    id_movimentacao_estoque numeric(18,0) default nextval('seq_mv_estoque') primary key,
+    cd_estoque numeric(18,0) not null,
+    cd_usuario numeric(18,0) not null,
+    nr_quantidade numeric(18,0) not null,
+    tx_tipo varchar(30) not null,
+    dt_movimentacao timestamp not null default current_timestamp,
+    tx_observacao varchar(255),
+    constraint fk_movimentacao_estoque
+        foreign key (cd_estoque) references tb_estoque (id_estoque),
+    constraint fk_movimentacao_usuario
+        foreign key (cd_usuario) references tb_usuario (id_usuario)
+);
+
+create sequence seq_fornecedor start 2 increment 2;
+
+create table tb_fornecedor (
+    id_fornecedor numeric(18,0) default nextval('seq_fornecedor') primary key,
+    tx_nome varchar(150) not null,
+    tx_documento varchar(30),
+    tx_email varchar(255),
+    tx_telefone numeric (18,0),
+    fl_ativo boolean not null default true
+);
+
+create sequence seq_compra start 2 increment 4;
+
+create table tb_compra (
+    id_compra numeric(18,0) default nextval('seq_compra') primary key,
+    cd_fornecedor numeric(18,0) not null,
+    cd_usuario numeric(18,0) not null,
+    dt_compra timestamp not null default current_timestamp,
+    vl_total numeric(12,2) not null default 0,
+    constraint fk_compra_fornecedor
+        foreign key (cd_fornecedor) references tb_fornecedor (id_fornecedor),
+    constraint fk_compra_usuario
+        foreign key (cd_usuario) references tb_usuario (id_usuario),
+    constraint ck_compra_total
+        check (vl_total >= 0)
+);
+
+create sequence seq_cp_produto start 2 increment 6;
+
+create table tb_compra_produto (
+    id_compra_produto numeric(18,0) default nextval('seq_cp_produto') primary key,
+    cd_compra numeric(18,0) not null,
+    cd_produto numeric(18,0) not null,
+    nr_quantidade numeric(18,0) not null,
+    vl_custo numeric(12,2) not null,
+    constraint fk_compra_produto_compra
+        foreign key (cd_compra) references tb_compra (id_compra),
+    constraint fk_compra_produto_produto
+        foreign key (cd_produto) references tb_produto (id_produto),
+    constraint ck_compra_produto_quantidade
+        check (nr_quantidade > 0),
+    constraint ck_compra_produto_custo
+        check (vl_custo >= 0)
+);

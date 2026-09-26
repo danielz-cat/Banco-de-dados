@@ -888,3 +888,26 @@ create table tb_compra_produto (
     constraint ck_compra_produto_custo
         check (vl_custo >= 0)
 );
+
+atv aula 25/09/26
+
+select
+    count(*) as quantidade_pedidos_entregues,
+    sum(total) as valor_total_pedidos
+from pedidos
+where status = 'entregue'
+  and criado_em >= now() - interval '90 days'
+order by mes;
+
+select
+    v.id as vendedor_id,
+    v.nome as vendedor,
+    count(p.id) as quantidade_pedidos,
+    coalesce(sum(p.total), 0) as faturamento
+from pedidos p
+join vendedores v
+    on v.id = p.vendedor_id
+where p.criado_em >= now() - interval '30 days'
+  and p.status <> 'cancelado'
+group by v.id, v.nome
+order by faturamento desc;

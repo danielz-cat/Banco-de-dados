@@ -911,3 +911,70 @@ where p.criado_em >= now() - interval '30 days'
   and p.status <> 'cancelado'
 group by v.id, v.nome
 order by faturamento desc;
+
+explain
+select * from tb_usuarios tu
+where tu.tx_email = 'usuario3500@exemplo.com';
+
+
+create unique index 
+	idx_usuario_email
+	on tb_usuarios(tx_email);
+
+explain
+select
+    id_pedido as codigo,
+    dt_pedido as data,
+    vl_total as valor_total
+from tb_pedidos
+where  cd_usuario = 1234
+order by dt_pedido;
+
+
+create index idx_pedidos_usuario_data
+on tb_pedidos (cd_usuario, dt_pedido);
+
+= 0,022 - 0,001 = 0,021
+	0,021 / 0,022 = 0,95
+		0,95 *100 = 95%;
+
+explain
+select
+    u.tx_nome       as nome_usuario,
+    p.id_pedido     as codigo_pedido,
+    pr.tx_nome      as nome_produto,
+    i.nr_quantidade as quantidade_itens,
+    i.vl_unitario   as valor_unitario
+from tb_usuarios u
+join tb_pedidos p
+    on p.cd_usuario = u.id_usuario
+join tb_itens_pedido i
+    on i.cd_pedido = p.id_pedido
+join tb_produtos pr
+    on pr.id_produto = i.cd_produto
+where u.id_usuario = 1234
+
+create index idx_pedidos_usuario
+on tb_pedidos (cd_usuario);
+
+create index idx_itens_pedido_pedido
+on tb_itens_pedido (cd_pedido);
+
+= 0,069 - 0,001 = 0,068
+	0,068 / 0,069 = 0,98
+		0,98 *100 = 98%;
+
+explain
+select
+    id_pedido as codigo_pedido,
+    vl_total as valor_total
+from tb_pedidos
+where tx_status = 'ENTREGUE'
+  and dt_pedido >= '2023-05-23';
+
+create index idx_pedidos_status_data
+on tb_pedidos (tx_status, dt_pedido);
+
+= 0,004 - 0,003 = 0,001
+	0,001 / 0,004 = 0,25
+		0,25 *100 = 25%;

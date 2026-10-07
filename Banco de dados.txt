@@ -978,3 +978,72 @@ on tb_pedidos (tx_status, dt_pedido);
 = 0,004 - 0,003 = 0,001
 	0,001 / 0,004 = 0,25
 		0,25 *100 = 25%;
+
+create sequence seq_atividade_id start 2 increment 2;
+
+create table tb_atividade (
+id_usuario numeric(18,0) default nextval('seq_atividade_id') primary key,
+tx_nome varchar (255) not null,
+dt_nacimento date,
+tx_genero varchar (255) not null
+);
+
+insert into tb_atividade (tx_nome, dt_nacimento, tx_genero)
+values ('joao', '2000-05-10', 'masculino'),
+('maria', '2001-08-20', 'feminino'),
+('pedro', '1999-03-15', 'masculino');
+
+create view vw_atividade as
+select
+    id_usuario,
+    tx_nome,
+    dt_nacimento,
+    tx_genero
+from tb_atividade;
+
+create materialized view mvw_atividade as
+select
+    id_usuario,
+    tx_nome,
+    dt_nacimento,
+    tx_genero
+from tb_atividade;
+
+insert into tb_atividade (tx_nome, dt_nacimento, tx_genero)
+values ('carlos', '2004-06-12', 'masculino'),
+('lara', '2002-09-22', 'feminino'),
+('lucas', '1998-04-16', 'masculino');
+
+create sequence seq_atividade_id_log start 2 increment 2;
+
+create table tb_atividade_log (
+id_usuario numeric(18,0) default nextval('seq_atividade_id_log') primary key,
+tx_query varchar (800),
+nr_idade numeric(18,0),
+tx_mensagem varchar (255),
+cd_atividade numeric(18,0)
+);
+
+create function fn_nome (valor numeric)
+returns varchar
+language plpgsql
+as $$
+begin
+	if(valor > 18 ) then 
+		return 'maior de idade';
+	elsif (valor = 18) then
+		return 'exatamente 18 anos';
+	else
+		return 'menor de idade';
+	end if;
+end
+$$;
+
+select *,
+	fn_nome(id_usuario ),
+	fn_nome(50) from tb_atividade
+	
+select 
+	age (dt_nacimento),
+	extract( year from age(dt_nacimento))
+from tb_atividade;	

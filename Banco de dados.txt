@@ -1047,3 +1047,114 @@ select
 	age (dt_nacimento),
 	extract( year from age(dt_nacimento))
 from tb_atividade;	
+
+aula 08/10/26
+
+create function calcular_desconto (valor numeric, percentual numeric)
+returns varchar
+language plpgsql
+as $$
+begin
+	return valor * (percentual / 100);
+end
+$$;
+
+create function calculadora
+	(valor1 numeric,
+		valor2 numeric, 
+			operacao numeric)
+returns numeric	
+language plpgsql
+as $$
+	declare
+		resultado numeric;
+	begin
+		case operacao
+		when  1 then
+			resultado := valor1 + valor2;
+		when  2 then
+			resultado := valor1 - valor2;
+		when  3 then
+			resultado := valor1 * valor2;
+		when  4 then
+			resultado := valor1 / valor2;
+		else 
+			resultado := -1;
+		end case;
+	
+		return resultado;	
+	end
+$$;
+
+create or replace function classificar_preco(preco numeric)
+returns varchar
+language plpgsql
+as $$
+begin
+    case
+        when preco < 50 then
+            return 'barato';
+
+        when preco < 200 then
+            return 'medio';
+
+        else
+            return 'caro';
+    end case;
+end;
+$$;
+
+create or replace function dobro(numero integer)
+returns integer
+language plpgsql
+as $$
+begin
+    return numero * 2;
+end;
+$$;
+
+create or replace function par_ou_impar(numero integer)
+returns varchar
+language plpgsql
+as $$
+begin
+    if numero % 2 = 0 then
+        return 'par';
+    else
+        return 'impar';
+    end if;
+end;
+$$;
+
+create or replace function verificar_nota()
+returns varchar
+language plpgsql
+as $$
+declare
+    nota numeric := 8;
+begin
+    if nota > 7 then
+        return 'aprovado';
+
+    elsif nota < 5 then
+        return 'reprovado';
+
+    else
+        nota := 6;
+        return 'recuperação';
+    end if;
+end;
+$$;
+
+create function log_atividade()
+return trigger
+language plpgsql as $$
+	begin
+		
+	end;
+$$
+
+create trigger tr_quando_atualizar_usuario
+before update on tb_atividade
+for each statement
+execute function função();

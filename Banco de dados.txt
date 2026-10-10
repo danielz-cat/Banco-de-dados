@@ -1158,3 +1158,78 @@ create trigger tr_quando_atualizar_usuario
 before update on tb_atividade
 for each statement
 execute function função();
+
+create or replace function atividade_log_update()
+returns trigger
+language plpgsql
+as $$
+	begin
+	insert into tb_atividade_log
+	(tx_query, nr_idade, tx_mensagem, cd_atividade)
+	values(
+		current_query(),
+		extract (year from age(
+				old.dt_nascimento	
+				)),
+		'MENSAGEM VIA TRIGGER',
+		new.id_atividade
+	);
+	return new;
+	end;
+$$;
+
+create trigger nome 
+	before
+	update on tb_atividade
+for each row 
+execute function atividade_log_update();
+
+update tb_atividade
+	set dt_nacimento = '1999-12-24',
+	id_usuario = 9
+where id_usuario = 1;
+
+select * from tb_atividade_log tal ;
+
+CREATE SEQUENCE seq_pagamentos_log START 2 INCREMENT 1;
+
+create table tb_pagamentos_log(
+	id_pagamento numeric(18,0) default nextval('seq_pagamentos_log') primary key,
+	tx_query varchar(800),
+	tx_forma varchar(10),
+	vl_antes numeric(18,2),
+	vl_depois numeric(18,2),
+	dt_modificacao date
+);
+
+create or replace function log_pagamentos()
+returns trigger
+language plpgsql
+as $$
+begin
+    new.tx_forma := lower(new.tx_forma);
+
+    if old.tx_forma is distinct from new.tx_forma then
+        insert into log_alteracoes_pagamentos (
+            tx_query,
+            dt_modificacao,
+            tx_valor_antes,
+            tx_valor_depois
+        )
+        values (
+            current_query(),
+            now(),
+            old.tx_forma,
+            new.tx_forma
+        );
+    end if;
+
+    return new;
+end;
+$$;
+
+create trigger trg_log_pagamentos
+before update of tx_forma
+on tb_pagamentos
+for each row
+execute function log_pagamentos();
